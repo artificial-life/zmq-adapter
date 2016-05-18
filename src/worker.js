@@ -5,9 +5,9 @@ let zmq = require('zmq');
 let RequestPool = require('async-requests').RequestPool;
 
 class Worker {
-	constructor(uri) {
+	constructor(uri, name) {
 		this.worker = zmq.socket('dealer');
-		this.worker.identity = 'zmq-worker-' + process.pid;
+		this.worker.identity = 'zmq-worker-' + name || process.pid;
 		this.worker.connect(uri);
 		this.worker.on('message', (...args) => this.handleMessage(args));
 		this.pool = new RequestPool('cycle', 100000);
@@ -61,6 +61,13 @@ class Worker {
 		});
 
 		return request.promise;
+	}
+	stoplistenTask(taskname) {
+		this.send({
+			type: 'stoplistenTask',
+			body: taskname
+		});
+		taskname && _.unset(this.callbacks, taskname);
 	}
 	listenTask(taskname, callback) {
 		this.send({

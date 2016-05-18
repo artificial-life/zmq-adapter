@@ -30,9 +30,24 @@ class Broker {
 	onresponseTask(identity, payload) {
 		this.broker.send([payload._recipient, '', JSON.stringify(payload)]);
 	}
+	onstoplistenTask(identity, payload) {
+		let task = payload.body;
+		//@NOTE: unsub all when no task specified
+		if (!task) {
+			_.forEach(taskmap, (taskarray, task) => {
+				taskmap[task] = _.without(taskarray, identity)
+			})
+			return;
+		}
+		if (taskmap[task]) {
+			taskmap[task] = _.without(taskmap[task], identity);
+			return;
+		}
+		return true;
+	}
 	onlistenTask(identity, payload) {
 		let task = payload.body;
-		if (taskmap[task]) {
+		if (taskmap[task] && !~taskmap[task].indexOf(identity)) {
 			taskmap[task].push(identity);
 			return;
 		}
