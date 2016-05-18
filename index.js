@@ -1,6 +1,6 @@
 module.exports = {
-  EventRouter: require('./build/EventRouter.js'),
-  TaskListener: require('./build/Worker.js'),
-  PubSubAdapter: require('./build/pubsub-adapter.js'),
-  Broker: require('./build/broker.js')
+	EventRouter: require('./build/event-router.js'),
+	TaskListener: require('./build/worker.js'),
+	PubSubAdapter: require('./build/pubsub-adapter.js'),
+	Broker: require('./build/broker.js')
 };
