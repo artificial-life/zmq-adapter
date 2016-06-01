@@ -1,7 +1,7 @@
 'use strict'
 
-var Broker = require('./broker.js');
-var EventRouter = require('./event-router.js');
+var Broker = require('../build/hybrid-broker.js');
+var EventRouter = require('../build/event-router.js');
 
 var broker = new Broker('tcp://*:5671');
 
