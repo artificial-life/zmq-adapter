@@ -43,9 +43,10 @@ gulp.task('es6', function() {
         console.log('error', e);
       }
     }))
-    .pipe(babel({
-      "presets": ["es2015"]
-    }))
+    // .pipe(babel({
+    //   // "presets": ["es2015"]
+    //   "presets": ["node6"]
+    // }))
     .pipe(gulp.dest("build"))
     .on('end', function() {
       console.log('build');

@@ -44,6 +44,7 @@ class Worker {
       },
       type: type,
       request_id: request_id,
+
       _sender: sender
     } = payload;
 
@@ -52,8 +53,12 @@ class Worker {
     }
 
     let cb = this.callbacks[taskname];
+    if (!cb) return this.makeErrorResponse(sender, request_id);
     let result = cb(params);
     Promise.resolve(result).then((d) => this.makeResponse(sender, request_id, d));
+  }
+  makeErrorResponse() {
+    console.log('Everything bad');
   }
   send(message) {
     this.worker.send(['', JSON.stringify(message)])

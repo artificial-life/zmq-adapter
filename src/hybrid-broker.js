@@ -13,27 +13,21 @@ class HybridBroker extends Broker {
     this.pool = new RequestPool('cycle', 100000);
     this.worker_status = {};
     this.heartbeat_id = setInterval(() => {
-      this.heartbeat()
+      this.heartbeat();
     }, HEARTBEAT_INTERVAL);
   }
   heartbeat() {
     _.forEach(this.worker_status, (status, worker_id) => {
-      this.addTask('heartbeat', '', worker_id).then(() => {
-        console.log("yeah, it's alive", worker_id);
-      }).catch((e) => {
-        console.log(e);
-        console.log("nope, it's not", worker_id);
-      })
+      this.addTask('heartbeat', '', worker_id).timeout(1000).catch((e) => this.onstoplistenTask(worker_id, {}));
     });
   }
   onlistenTask(identity, payload) {
     this.worker_status[identity] = true;
     super.onlistenTask(identity, payload);
   }
-  onstoplistenTask(payload) {
-    //@NOTE: removing worker from list
-    !payload.body && _.unset(this.worker_status, identity);
-    super.onstoplistenTask(payload);
+  onstoplistenTask(identity, payload) {
+    !payload.body && _.unset(this.worker_status, identity); //@NOTE: removing worker from list
+    super.onstoplistenTask(identity, payload);
   }
   onresponseTask(identity, payload) {
     payload._recipient != 'self' ? super.onresponseTask(identity, payload) : this.pool.handleRequest(payload);

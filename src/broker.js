@@ -33,7 +33,7 @@ class Broker {
     //@NOTE: unsub all when no task specified
     if (!task) {
       _.forEach(this.taskmap, (taskarray, task) => {
-        _.pull(taskarray, identity)
+        _.pull(taskarray, identity);
       })
       return;
     }
