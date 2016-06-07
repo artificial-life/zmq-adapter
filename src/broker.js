@@ -56,11 +56,15 @@ class Broker {
   onaddTask(identity, payload, target_worker) {
     let body = payload.body;
     let taskname = body.taskname;
-    let free_worker = target_worker || this.getWorkerForTask(taskname)
+    let free_worker = target_worker || this.getWorkerForTask(taskname);
 
-    this.sendTask(free_worker, identity, payload);
+    if (free_worker) {
+      this.sendTask(free_worker, identity, payload);
+    }
   }
   getWorkerForTask(taskname) {
+    if (_.isEmpty(this.taskmap[taskname])) return false;
+
     let cursor = this.cursors[taskname] = (this.cursors[taskname] + 1) % this.taskmap[taskname].length;
 
     return this.taskmap[taskname][cursor];
