@@ -17,7 +17,7 @@ class HybridBroker extends Broker {
 		}, HEARTBEAT_INTERVAL);
 	}
 	getWorkersCount() {
-		return _.size(worker_status);
+		return _.size(this.worker_status);
 	}
 	heartbeat() {
 		_.forEach(this.worker_status, (status, worker_id) => {
