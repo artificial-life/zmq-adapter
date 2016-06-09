@@ -5,29 +5,16 @@ let zmq = require('zmq');
 let RequestPool = require('async-requests').RequestPool;
 
 class Worker {
-	constructor(uri, name) {
-		this.worker = zmq.socket('dealer');
-		this.worker.identity = 'zmq-worker-' + (name || process.pid);
+  constructor(uri, name) {
+    this.worker = zmq.socket('dealer');
+    this.worker.identity = 'zmq-worker-' + (name || process.pid);
 
-		this.callbacks = {};
-		this.listenTask('heartbeat', () => {
-			console.log('hb on', process.pid);
-			return true;
-		});
+    this.callbacks = {};
+    this.listenTask('heartbeat', () => true);
 
-		this.worker.on('connect', () => {
-			console.log('connected', process.pid);
-			let registered_tasks = _.keys(this.callbacks);
-			console.log('registering tasks', registered_tasks);
-			_.forEach(registered_tasks, (taskname) => {
-				this.send({
-					type: 'listenTask',
-					body: taskname
-				});
-			});
-		});
-		this.worker.monitor(500, 0);
-		this.worker.connect(uri);
+    this.worker.on('connect', () => {
+      console.log('connected', process.pid);
+      let registered_tasks = _.keys(this.callbacks);
 
 		this.worker.on('message', (...args) => this.handleMessage(args));
 		this.pool = new RequestPool('cycle', 100000);
@@ -101,6 +88,22 @@ class Worker {
 		});
 		this.callbacks[taskname] = callback;
 	}
+    return request.promise;
+  }
+  stoplistenTask(taskname) {
+    this.send({
+      type: 'stoplistenTask',
+      body: taskname
+    });
+    taskname && _.unset(this.callbacks, taskname);
+  }
+  listenTask(taskname, callback) {
+    this.send({
+      type: 'listenTask',
+      body: taskname
+    });
+    this.callbacks[taskname] = callback;
+  }
 }
 
 module.exports = Worker;
